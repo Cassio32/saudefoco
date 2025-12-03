@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HealthTrack - Calculadora de IMC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4A6FA5;
+            --primary-dark: #385D8A;
+            --secondary: #6BCCB4;
+            --light: #F8F9FA;
+            --dark: #2C3E50;
+            --gray: #8E9BA6;
+            --success: #2ECC71;
+            --warning: #F39C12;
+            --danger: #E74C3C;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --app-width: 100%;
+            --max-width: 400px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        body {
+            background-color: #F0F4F8;
+            color: var(--dark);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 16px 40px;
+            overflow-x: hidden;
+        }
+
+        /* Header estilo app móvel */
+        .app-header {
+            width: var(--app-width);
+            max-width: var(--max-width);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            margin-bottom: 8px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: #F0F4F8;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtext {
+            font-size: 12px;
+            color: var(--gray);
+            font-weight: 500;
+            margin-top: -2px;
+        }
+
+        .app-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 18px;
+            box-shadow: var(--shadow);
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Container principal */
+        .app-container {
+            width: var(--app-width);
+            max-width: var(--max-width);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Card estilo móvel */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 8px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        /* Inputs estilo móvel */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px 16px 16px 48px;
+            border: 2px solid #E8EDF2;
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--dark);
+            background-color: #F9FBFD;
+            transition: all 0.2s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            color: var(--gray);
+            font-size: 18px;
+        }
+
+        .unit-selector {
+            display: flex;
+            background-color: #F0F4F8;
+            border-radius: var(--radius-sm);
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .unit-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--gray);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .unit-btn.active {
+            background-color: white;
+            color: var(--primary);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Botão principal */
+        .primary-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 17px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(74, 111, 165, 0.25);
+        }
+
+        .primary-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 6px rgba(74, 111, 165, 0.25);
+        }
+
+        /* Resultados */
+        .result-card {
+            display: none;
+            text-align: center;
+            padding: 30px 24px;
+        }
+
+        .imc-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #3498db 0% 16.67%,
+                #2ecc71 16.67% 50%,
+                #f1c40f 50% 66.67%,
+                #e67e22 66.67% 83.33%,
+                #e74c3c 83.33% 100%
+            );
+            margin: 0 auto 24px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .imc-inner-circle {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .imc-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1;
+        }
+
+        .imc-label {
+            font-size: 14px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+
+        .classification {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .classification.abaixo { color: #3498db; }
+        .classification.normal { color: #2ecc71; }
+        .classification.sobrepeso { color: #f1c40f; }
+        .classification.obesidade { color: #e74c3c; }
+
+        .result-text {
+            color: var(--gray);
+            font-size: 15px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        /* Dicas */
+        .tips-container {
+            display: none;
+        }
+
+        .tips-list {
+            list-style: none;
+        }
+
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 16px 0;
+            border-bottom: 1px solid #F0F4F8;
+        }
+
+        .tip-item:last-child {
+            border-bottom: none;
+        }
+
+        .tip-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background-color: rgba(74, 111, 165, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .tip-content {
+            flex: 1;
+        }
+
+        .tip-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .tip-desc {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* WhatsApp */
+        .whatsapp-card {
+            display: none;
+        }
+
+        .whatsapp-btn {
+            background-color: #25D366;
+            margin-top: 16px;
+        }
+
+        .whatsapp-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25);
+        }
+
+        .whatsapp-note {
+            font-size: 13px;
+            color: var(--gray);
+            text-align: center;
+            margin-top: 16px;
+            line-height: 1.4;
+        }
+
+        /* Opções de envio */
+        .send-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .send-option-btn {
+            flex: 1;
+            padding: 14px;
+            background-color: #F0F4F8;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            color: var(--gray);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .send-option-btn.active {
+            background-color: rgba(37, 211, 102, 0.1);
+            color: #25D366;
+            border: 1px solid rgba(37, 211, 102, 0.2);
+        }
+
+        .phone-input-container {
+            margin-top: 16px;
+            display: none;
+        }
+
+        .phone-prefix {
+            position: absolute;
+            left: 16px;
+            color: var(--gray);
+            font-size: 16px;
+            font-weight: 500;
+            z-index: 2;
+        }
+
+        .phone-input {
+            padding-left: 60px !important;
+        }
+
+        .phone-example {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 6px;
+            margin-left: 4px;
+        }
+
+        /* Indicador de IMC */
+        .imc-scale {
+            display: flex;
+            margin-top: 24px;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: #E8EDF2;
+        }
+
+        .scale-segment {
+            flex: 1;
+        }
+
+        .scale-label {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--gray);
+        }
+
+        /* Indicador móvel */
+        .status-bar {
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, #3498db, #2ecc71, #f1c40f, #e67e22, #e74c3c);
+            border-radius: 2px;
+            margin-top: 8px;
+            position: relative;
+        }
+
+        .indicator {
+            position: absolute;
+            top: -6px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: white;
+            border: 3px solid var(--primary);
+            transform: translateX(-50%);
+            transition: left 0.5s ease;
+        }
+
+        /* Modal para contatos salvos */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: white;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 24px;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .contacts-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid #E8EDF2;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .contact-item:hover {
+            background-color: #F9FBFD;
+            border-color: var(--primary);
+        }
+
+        .contact-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .contact-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .contact-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .contact-phone {
+            font-size: 14px;
+            color: var(--gray);
+            margin-top: 2px;
+        }
+
+        .contact-select-btn {
+            background-color: #25D366;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .add-contact-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: #F0F4F8;
+            border: 2px dashed #E8EDF2;
+            border-radius: var(--radius-sm);
+            color: var(--primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Footer */
+        .app-footer {
+            width: var(--app-width);
+            max-width: var(--max-width);
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #E8EDF2;
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        /* Responsividade */
+        @media (max-width: 480px) {
+            .card {
+                padding: 20px;
+            }
+            
+            .imc-circle {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .imc-inner-circle {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .imc-value {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header estilo app móvel -->
+    <div class="app-header">
+        <div class="logo-container" style="margin:0px auto; display:block;">
+				<!--<div class="logo-icon">SF</div>-->
+				<div class="logo">
+					<img src="ico-saude.jpg"  width="150" style="border-radius:80px;
+					">
+				</div>	
+				
+             <div>			 
+                <!--<div class="logo-text">Saude em Foco</div>
+                <div class="logo-subtext">Calculadora de IMC</div>-->
+            </div>
+        </div>
+        <div class="app-actions">
+            <!--<button class="icon-btn" id="infoBtn">
+                <i class="fas fa-info"></i>
+            </button>
+            <button class="icon-btn" id="contactsBtn">
+                <i class="fas fa-address-book"></i>
+            </button>-->
+        </div>
+    </div>
+
+    <!-- Container principal -->
+    <div class="app-container">
+        <!-- Card de entrada de dados -->
+        <div class="card" id="inputCard">
+            <h2 class="card-title">
+                <i class="fas fa-calculator"></i>
+                Calcule seu IMC
+            </h2>
+            
+            <div class="unit-selector">
+                <button class="unit-btn active" id="metricBtn">
+                    <i class="fas fa-ruler"></i> Métrico
+                </button>
+                <!--<button class="unit-btn" id="imperialBtn">
+                    <i class="fas fa-ruler-combined"></i> Imperial
+                </button>-->
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">Peso</label>
+                <div class="input-container">
+                    <i class="fas fa-weight input-icon"></i>
+                    <input type="number" id="weightInput" class="input-field" placeholder="70.5" min="1" max="300" step="0.1">
+                </div>
+                <div class="input-label unit-label" id="weightUnit">kg</div>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">Altura</label>
+                <div class="input-container">
+                    <i class="fas fa-ruler-vertical input-icon"></i>
+                    <input type="number" id="heightInput" class="input-field" placeholder="1.75" min="0.5" max="2.5" step="0.01">
+                </div>
+                <div class="input-label unit-label" id="heightUnit">metros</div>
+            </div>
+            
+            <div class="status-bar">
+                <div class="indicator" id="imcIndicator" style="left: 50%;"></div>
+            </div>
+            
+            <button class="primary-btn" id="calculateBtn">
+                <i class="fas fa-calculator"></i>
+                Calcular IMC
+            </button>
+        </div>
+
+        <!-- Card de resultados -->
+        <div class="card result-card" id="resultCard">
+            <h2 class="card-title">
+                <i class="fas fa-chart-line"></i>
+                Seu Resultado
+            </h2>
+            
+            <div class="imc-circle">
+                <div class="imc-inner-circle">
+                    <div class="imc-value" id="imcValue">--</div>
+                    <div class="imc-label">IMC</div>
+                </div>
+            </div>
+            
+            <div class="classification" id="classificationText">Classificação</div>
+            <p class="result-text" id="resultText">Preencha seus dados para calcular o IMC</p>
+            
+            <div class="imc-scale">
+                <div class="scale-segment" style="background-color: #3498db;"></div>
+                <div class="scale-segment" style="background-color: #2ecc71;"></div>
+                <div class="scale-segment" style="background-color: #f1c40f;"></div>
+                <div class="scale-segment" style="background-color: #e67e22;"></div>
+                <div class="scale-segment" style="background-color: #e74c3c;"></div>
+            </div>
+            
+            <div class="scale-label">
+                <span>Abaixo</span>
+                <span>Normal</span>
+                <span>Sobrepeso</span>
+                <span>Obesidade I</span>
+                <span>Obesidade II</span>
+            </div>
+        </div>
+
+        <!-- Card de dicas de saúde -->
+        <div class="card tips-container" id="tipsCard">
+            <h2 class="card-title">
+                <i class="fas fa-heartbeat"></i>
+                Dicas de Saúde
+            </h2>
+            
+            <ul class="tips-list" id="tipsList">
+                <!-- Dicas serão inseridas aqui via JavaScript -->
+            </ul>
+        </div>
+
+        <!-- Card de compartilhamento WhatsApp -->
+        <div class="card whatsapp-card" id="whatsappCard">
+            <h2 class="card-title">
+                <i class="fab fa-whatsapp"></i>
+                Compartilhar Resultado
+            </h2>
+            
+            <p class="result-text">Envie suas dicas de saúde personalizadas para seu WhatsApp ou para um profissional de saúde.</p>
+            
+            <div class="send-options">
+                <button class="send-option-btn active" id="sendToMe">
+                    <i class="fas fa-user"></i> Para mim
+                </button>
+                <button class="send-option-btn" id="sendToContact">
+                    <i class="fas fa-phone-alt"></i> Para contato
+                </button>
+            </div>
+            
+            <div class="phone-input-container" id="phoneInputContainer">
+                <div class="input-group">
+                    <label class="input-label">Número do WhatsApp</label>
+                    <div class="input-container">
+                        <span class="phone-prefix">+55</span>
+                        <input type="tel" id="phoneInput" class="input-field phone-input" placeholder="11 99999-9999">
+                    </div>
+                    <div class="phone-example">Exemplo: 11 99999-9999 (apenas números)</div>
+                </div>
+            </div>
+            
+            <button class="primary-btn whatsapp-btn" id="whatsappBtn">
+                <i class="fab fa-whatsapp"></i>
+                Enviar via WhatsApp
+            </button>
+            
+            <p class="whatsapp-note">
+                <i class="fas fa-info-circle"></i>
+                Será aberto o WhatsApp com sua mensagem pronta para enviar.
+            </p>
+        </div>
+    </div>
+
+    <!-- Modal de contatos -->
+    <div class="modal-overlay" id="contactsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Contatos Salvos</div>
+                <button class="modal-close" id="closeContactsModal">&times;</button>
+            </div>
+            
+            <ul class="contacts-list" id="contactsList">
+                <!-- Contatos serão inseridos aqui via JavaScript -->
+            </ul>
+            
+            <button class="add-contact-btn" id="addContactBtn">
+                <i class="fas fa-plus"></i> Adicionar Novo Contato
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="app-footer">
+        <p>Todos os Direitos Reservados © 2025 - Alunos(as) 2º Ano De Desenvolvimento de Sistemas.</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos DOM
+            const weightInput = document.getElementById('weightInput');
+            const heightInput = document.getElementById('heightInput');
+            const weightUnit = document.getElementById('weightUnit');
+            const heightUnit = document.getElementById('heightUnit');
+            const metricBtn = document.getElementById('metricBtn');
+            const imperialBtn = document.getElementById('imperialBtn');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultCard = document.getElementById('resultCard');
+            const tipsCard = document.getElementById('tipsCard');
+            const whatsappCard = document.getElementById('whatsappCard');
+            const imcValue = document.getElementById('imcValue');
+            const classificationText = document.getElementById('classificationText');
+            const resultText = document.getElementById('resultText');
+            const tipsList = document.getElementById('tipsList');
+            const whatsappBtn = document.getElementById('whatsappBtn');
+            const imcIndicator = document.getElementById('imcIndicator');
+            const infoBtn = document.getElementById('infoBtn');
+            const contactsBtn = document.getElementById('contactsBtn');
+            const sendToMe = document.getElementById('sendToMe');
+            const sendToContact = document.getElementById('sendToContact');
+            const phoneInputContainer = document.getElementById('phoneInputContainer');
+            const phoneInput = document.getElementById('phoneInput');
+            const contactsModal = document.getElementById('contactsModal');
+            const closeContactsModal = document.getElementById('closeContactsModal');
+            const contactsList = document.getElementById('contactsList');
+            const addContactBtn = document.getElementById('addContactBtn');
+            
+            let isMetric = true;
+            let currentImc = 0;
+            let currentClassification = '';
+            let sendOption = 'me'; // 'me' ou 'contact'
+            let contacts = JSON.parse(localStorage.getItem('healthTrackContacts')) || [
+                { name: "Dr. Silva", phone: "11987654321", initials: "DS" },
+                { name: "Nutricionista Ana", phone: "21987654321", initials: "NA" },
+                { name: "Personal Trainer", phone: "31987654321", initials: "PT" }
+            ];
+            
+            // Inicializar lista de contatos
+            renderContacts();
+            
+            // Alternar entre sistemas métrico e imperial
+            metricBtn.addEventListener('click', function() {
+                if (!isMetric) {
+                    isMetric = true;
+                    metricBtn.classList.add('active');
+                    imperialBtn.classList.remove('active');
+                    weightUnit.textContent = 'kg';
+                    heightUnit.textContent = 'metros';
+                    weightInput.placeholder = '70.5';
+                    heightInput.placeholder = '1.75';
+                    
+                    // Converter valores se existirem
+                    if (weightInput.value && heightInput.value) {
+                        // Converter lbs para kg (1 lb = 0.453592 kg)
+                        weightInput.value = (parseFloat(weightInput.value) * 0.453592).toFixed(1);
+                        // Converter ft para m (1 ft = 0.3048 m)
+                        heightInput.value = (parseFloat(heightInput.value) * 0.3048).toFixed(2);
+                    }
+                }
+            });
+            
+            imperialBtn.addEventListener('click', function() {
+                if (isMetric) {
+                    isMetric = false;
+                    imperialBtn.classList.add('active');
+                    metricBtn.classList.remove('active');
+                    weightUnit.textContent = 'lbs';
+                    heightUnit.textContent = 'pés';
+                    weightInput.placeholder = '155';
+                    heightInput.placeholder = '5.8';
+                    
+                    // Converter valores se existirem
+                    if (weightInput.value && heightInput.value) {
+                        // Converter kg para lbs (1 kg = 2.20462 lbs)
+                        weightInput.value = (parseFloat(weightInput.value) * 2.20462).toFixed(1);
+                        // Converter m para ft (1 m = 3.28084 ft)
+                        heightInput.value = (parseFloat(heightInput.value) * 3.28084).toFixed(1);
+                    }
+                }
+            });
+            
+            // Opções de envio
+            sendToMe.addEventListener('click', function() {
+                sendOption = 'me';
+                sendToMe.classList.add('active');
+                sendToContact.classList.remove('active');
+                phoneInputContainer.style.display = 'none';
+            });
+            
+            sendToContact.addEventListener('click', function() {
+                sendOption = 'contact';
+                sendToContact.classList.add('active');
+                sendToMe.classList.remove('active');
+                phoneInputContainer.style.display = 'block';
+            });
+            
+            // Calcular IMC
+            calculateBtn.addEventListener('click', function() {
+                let weight = parseFloat(weightInput.value);
+                let height = parseFloat(heightInput.value);
+                
+                // Validação
+                if (!weight || !height || weight <= 0 || height <= 0) {
+                    alert('Por favor, insira valores válidos para peso e altura.');
+                    return;
+                }
+                
+                // Converter para sistema métrico se necessário
+                if (!isMetric) {
+                    // Converter lbs para kg
+                    weight = weight * 0.453592;
+                    // Converter ft para m
+                    height = height * 0.3048;
+                }
+                
+                // Calcular IMC
+                currentImc = weight / (height * height);
+                
+                // Determinar classificação e dicas
+                let classification, colorClass, tips;
+                
+                if (currentImc < 18.5) {
+                    classification = "Abaixo do Peso";
+                    colorClass = "abaixo";
+                    tips = [
+                        {
+                            icon: "fas fa-utensils",
+                            title: "Aumente a ingestão calórica",
+                            desc: "Consuma alimentos nutritivos e ricos em calorias como abacate, oleaginosas e azeite."
+                        },
+                        {
+                            icon: "fas fa-dumbbell",
+                            title: "Exercícios de força",
+                            desc: "Inclua treinamento de resistência para ganho de massa muscular."
+                        },
+                        {
+                            icon: "fas fa-clock",
+                            title: "Refeições regulares",
+                            desc: "Estabeleça horários fixos para se alimentar, com 5-6 refeições ao dia."
+                        },
+                        {
+                            icon: "fas fa-user-md",
+                            title: "Consulte um especialista",
+                            desc: "Procure um nutricionista para um plano alimentar personalizado."
+                        }
+                    ];
+                } else if (currentImc < 24.9) {
+                    classification = "Peso Normal";
+                    colorClass = "normal";
+                    tips = [
+                        {
+                            icon: "fas fa-check-circle",
+                            title: "Mantenha os hábitos",
+                            desc: "Continue com sua alimentação balanceada e prática regular de exercícios."
+                        },
+                        {
+                            icon: "fas fa-tint",
+                            title: "Hidratação adequada",
+                            desc: "Beba pelo menos 2 litros de água por dia para manter seu metabolismo ativo."
+                        },
+                        {
+                            icon: "fas fa-apple-alt",
+                            title: "Variedade nutricional",
+                            desc: "Inclua diferentes grupos alimentares em suas refeições para nutrição completa."
+                        },
+                        {
+                            icon: "fas fa-heart",
+                            title: "Check-up regular",
+                            desc: "Faça exames médicos anualmente para monitorar sua saúde."
+                        }
+                    ];
+                } else if (currentImc < 29.9) {
+                    classification = "Sobrepeso";
+                    colorClass = "sobrepeso";
+                    tips = [
+                        {
+                            icon: "fas fa-walking",
+                            title: "Atividade física regular",
+                            desc: "Pratique pelo menos 150 minutos de exercícios moderados por semana."
+                        },
+                        {
+                            icon: "fas fa-carrot",
+                            title: "Controle de porções",
+                            desc: "Reduza o tamanho das porções e evite alimentos ultraprocessados."
+                        },
+                        {
+                            icon: "fas fa-bed",
+                            title: "Sono de qualidade",
+                            desc: "Durma 7-8 horas por noite para regular hormônios que controlam o apetite."
+                        },
+                        {
+                            icon: "fas fa-seedling",
+                            title: "Mais vegetais",
+                            desc: "Aumente o consumo de vegetais e frutas para aumentar a saciedade."
+                        }
+                    ];
+                } else {
+                    classification = "Obesidade";
+                    colorClass = "obesidade";
+                    tips = [
+                        {
+                            icon: "fas fa-user-md",
+                            title: "Acompanhamento médico",
+                            desc: "Consulte um médico para avaliação completa e plano de tratamento."
+                        },
+                        {
+                            icon: "fas fa-swimming-pool",
+                            title: "Exercícios de baixo impacto",
+                            desc: "Comece com atividades como caminhada, natação ou ciclismo."
+                        },
+                        {
+                            icon: "fas fa-clipboard-list",
+                            title: "Diário alimentar",
+                            desc: "Registre tudo o que consome para identificar padrões alimentares."
+                        },
+                        {
+                            icon: "fas fa-brain",
+                            title: "Mudança de hábitos",
+                            desc: "Considere acompanhamento psicológico para mudança comportamental."
+                        }
+                    ];
+                }
+                
+                currentClassification = classification;
+                
+                // Atualizar resultado
+                imcValue.textContent = currentImc.toFixed(1);
+                classificationText.textContent = classification;
+                classificationText.className = `classification ${colorClass}`;
+                resultText.textContent = `Seu Índice de Massa Corporal é ${currentImc.toFixed(1)}. ${getResultMessage(currentImc)}`;
+                
+                // Atualizar indicador
+                updateIndicator(currentImc);
+                
+                // Mostrar dicas
+                tipsList.innerHTML = '';
+                tips.forEach(tip => {
+                    const li = document.createElement('li');
+                    li.className = 'tip-item fade-in';
+                    li.innerHTML = `
+                        <div class="tip-icon">
+                            <i class="${tip.icon}"></i>
+                        </div>
+                        <div class="tip-content">
+                            <div class="tip-title">${tip.title}</div>
+                            <div class="tip-desc">${tip.desc}</div>
+                        </div>
+                    `;
+                    tipsList.appendChild(li);
+                });
+                
+                // Mostrar cards
+                resultCard.style.display = 'block';
+                tipsCard.style.display = 'block';
+                whatsappCard.style.display = 'block';
+                
+                // Rolar para resultados
+                resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+            
+            // Atualizar indicador na barra de status
+            function updateIndicator(imc) {
+                let position = 0;
+                
+                if (imc < 18.5) {
+                    position = (imc / 18.5) * 20;
+                } else if (imc < 24.9) {
+                    position = 20 + ((imc - 18.5) / (24.9 - 18.5)) * 30;
+                } else if (imc < 29.9) {
+                    position = 50 + ((imc - 24.9) / (29.9 - 24.9)) * 16.67;
+                } else if (imc < 34.9) {
+                    position = 66.67 + ((imc - 29.9) / (34.9 - 29.9)) * 16.67;
+                } else {
+                    position = Math.min(83.33 + ((imc - 34.9) / 20) * 16.67, 100);
+                }
+                
+                imcIndicator.style.left = `${position}%`;
+            }
+            
+            // Mensagem personalizada de resultado
+            function getResultMessage(imc) {
+                if (imc < 18.5) {
+                    return "É recomendável buscar orientação nutricional para atingir um peso saudável.";
+                } else if (imc < 24.9) {
+                    return "Parabéns! Continue mantendo um estilo de vida saudável.";
+                } else if (imc < 29.9) {
+                    return "Algumas mudanças no estilo de vida podem ajudar a alcançar um peso mais saudável.";
+                } else {
+                    return "Recomenda-se buscar orientação profissional para um plano de saúde personalizado.";
+                }
+            }
+            
+            // Enviar via WhatsApp
+            whatsappBtn.addEventListener('click', function() {
+                const weight = weightInput.value;
+                const height = heightInput.value;
+                const unit = isMetric ? 'kg' : 'lbs';
+                const heightUnit = isMetric ? 'm' : 'ft';
+                
+                // Criar mensagem
+                let message = `*HealthTrack - Resultado do IMC*%0A%0A`;
+                message += `📊 *IMC:* ${currentImc.toFixed(1)}%0A`;
+                message += `🏷️ *Classificação:* ${currentClassification}%0A`;
+                message += `⚖️ *Peso:* ${weight} ${unit}%0A`;
+                message += `📏 *Altura:* ${height} ${heightUnit}%0A%0A`;
+                message += `*Dicas de Saúde:*%0A`;
+                
+                // Adicionar dicas
+                const tipsElements = tipsList.querySelectorAll('.tip-item');
+                tipsElements.forEach((tip, index) => {
+                    const title = tip.querySelector('.tip-title').textContent;
+                    const desc = tip.querySelector('.tip-desc').textContent;
+                    message += `${index + 1}. *${title}:* ${desc}%0A`;
+                });
+                
+                message += `%0A_Enviado pelo HealthTrack App_`;
+                
+                // Definir a URL do WhatsApp baseada na opção selecionada
+                let whatsappUrl;
+                
+                if (sendOption === 'me') {
+                    // Enviar para o próprio usuário (abre WhatsApp Web sem número específico)
+                    whatsappUrl = `https://web.whatsapp.com/send?text=${message}`;
+                } else {
+                    // Enviar para um número específico
+                    const phoneNumber = phoneInput.value.replace(/\D/g, ''); // Remove não-números
+                    
+                    if (!phoneNumber || phoneNumber.length < 10 || phoneNumber.length > 11) {
+                        alert('Por favor, insira um número de telefone válido (10 ou 11 dígitos).');
+                        return;
+                    }
+                    
+                    // Formato internacional: 55 (Brasil) + DDD + número
+                    const fullPhoneNumber = `55${phoneNumber}`;
+                    whatsappUrl = `https://wa.me/${fullPhoneNumber}?text=${message}`;
+                }
+                
+                // Abrir WhatsApp
+                window.open(whatsappUrl, '_blank');
+            });
+            
+            // Botões de ação
+            infoBtn.addEventListener('click', function() {
+                alert("HealthTrack - Calculadora de IMC\n\nEste aplicativo calcula seu Índice de Massa Corporal e fornece dicas personalizadas de saúde.\n\nO IMC é uma medida geral, mas não leva em conta composição corporal. Consulte um profissional de saúde para avaliação completa.");
+            });
+            
+            contactsBtn.addEventListener('click', function() {
+                contactsModal.classList.add('active');
+            });
+            
+            closeContactsModal.addEventListener('click', function() {
+                contactsModal.classList.remove('active');
+            });
+            
+            // Fechar modal ao clicar fora
+            contactsModal.addEventListener('click', function(e) {
+                if (e.target === contactsModal) {
+                    contactsModal.classList.remove('active');
+                }
+            });
+            
+            // Adicionar contato
+            addContactBtn.addEventListener('click', function() {
+                const name = prompt("Nome do contato:");
+                if (!name) return;
+                
+                const phone = prompt("Número do WhatsApp (apenas números, ex: 11987654321):");
+                if (!phone || !/^\d{10,11}$/.test(phone)) {
+                    alert("Por favor, insira um número válido (10 ou 11 dígitos).");
+                    return;
+                }
+                
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                
+                const newContact = {
+                    name,
+                    phone,
+                    initials
+                };
+                
+                contacts.push(newContact);
+                saveContacts();
+                renderContacts();
+                
+                alert("Contato adicionado com sucesso!");
+            });
+            
+            // Renderizar lista de contatos
+            function renderContacts() {
+                contactsList.innerHTML = '';
+                
+                contacts.forEach((contact, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'contact-item';
+                    li.innerHTML = `
+                        <div class="contact-info">
+                            <div class="contact-avatar">${contact.initials}</div>
+                            <div>
+                                <div class="contact-name">${contact.name}</div>
+                                <div class="contact-phone">${formatPhone(contact.phone)}</div>
+                            </div>
+                        </div>
+                        <button class="contact-select-btn" data-index="${index}">Usar</button>
+                    `;
+                    contactsList.appendChild(li);
+                });
+                
+                // Adicionar eventos aos botões "Usar"
+                document.querySelectorAll('.contact-select-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        const contact = contacts[index];
+                        
+                        // Preencher o campo de telefone
+                        phoneInput.value = formatPhone(contact.phone);
+                        
+                        // Mudar para opção de envio para contato
+                        sendOption = 'contact';
+                        sendToContact.click();
+                        
+                        // Fechar modal
+                        contactsModal.classList.remove('active');
+                        
+                        // Rolar para o card do WhatsApp
+                        whatsappCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    });
+                });
+            }
+            
+            // Salvar contatos no localStorage
+            function saveContacts() {
+                localStorage.setItem('healthTrackContacts', JSON.stringify(contacts));
+            }
+            
+            // Formatar número de telefone
+            function formatPhone(phone) {
+                const cleaned = phone.replace(/\D/g, '');
+                const match = cleaned.match(/^(\d{2})(\d{4,5})(\d{4})$/);
+                if (match) {
+                    return `(${match[1]}) ${match[2]}-${match[3]}`;
+                }
+                return phone;
+            }
+            
+            // Formatar telefone enquanto digita
+            phoneInput.addEventListener('input', function() {
+                let value = this.value.replace(/\D/g, '');
+                
+                if (value.length > 11) {
+                    value = value.substring(0, 11);
+                }
+                
+                if (value.length > 0) {
+                    if (value.length <= 2) {
+                        value = `(${value}`;
+                    } else if (value.length <= 7) {
+                        value = `(${value.substring(0,2)}) ${value.substring(2)}`;
+                    } else {
+                        value = `(${value.substring(0,2)}) ${value.substring(2,7)}-${value.substring(7)}`;
+                    }
+                }
+                
+                this.value = value;
+            });
+            
+            // Atualizar indicador conforme digita
+            weightInput.addEventListener('input', updateIndicatorFromInputs);
+            heightInput.addEventListener('input', updateIndicatorFromInputs);
+            
+            function updateIndicatorFromInputs() {
+                const weight = parseFloat(weightInput.value);
+                const height = parseFloat(heightInput.value);
+                
+                if (weight && height && weight > 0 && height > 0) {
+                    let calcWeight = weight;
+                    let calcHeight = height;
+                    
+                    if (!isMetric) {
+                        calcWeight = weight * 0.453592;
+                        calcHeight = height * 0.3048;
+                    }
+                    
+                    const imc = calcWeight / (calcHeight * calcHeight);
+                    updateIndicator(imc);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
